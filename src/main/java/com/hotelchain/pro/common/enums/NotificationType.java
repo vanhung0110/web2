@@ -1,0 +1,14 @@
+package com.hotelchain.pro.common.enums;
+
+public enum NotificationType {
+    BOOKING_CONFIRMED,
+    BOOKING_CANCELLED,
+    PAYMENT_RECEIVED,
+    CHECKOUT_REMINDER,
+    NEW_BOOKING_ALERT,
+    PAYMENT_OVERDUE,
+    ROOM_NEEDS_CLEANING,
+    MAINTENANCE_ALERT,
+    SHIFT_REMINDER,
+    GENERAL
+}
