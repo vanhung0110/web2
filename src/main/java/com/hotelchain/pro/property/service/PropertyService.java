@@ -2,6 +2,8 @@ package com.hotelchain.pro.property.service;
 
 import com.hotelchain.pro.auth.entity.User;
 import com.hotelchain.pro.common.enums.Role;
+import com.hotelchain.pro.common.enums.RoomStatus;
+import com.hotelchain.pro.common.enums.RoomView;
 import com.hotelchain.pro.common.exception.ResourceNotFoundException;
 import com.hotelchain.pro.property.dto.CreatePropertyRequest;
 import com.hotelchain.pro.property.dto.PropertyDto;
@@ -10,12 +12,17 @@ import com.hotelchain.pro.property.entity.Property;
 import com.hotelchain.pro.property.entity.Tenant;
 import com.hotelchain.pro.property.repository.PropertyRepository;
 import com.hotelchain.pro.property.repository.TenantRepository;
+import com.hotelchain.pro.room.entity.Room;
+import com.hotelchain.pro.room.entity.RoomType;
+import com.hotelchain.pro.room.repository.RoomRepository;
+import com.hotelchain.pro.room.repository.RoomTypeRepository;
 import com.hotelchain.pro.storage.service.MinioStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +36,8 @@ public class PropertyService {
     private final PropertyRepository propertyRepository;
     private final TenantRepository tenantRepository;
     private final MinioStorageService storageService;
+    private final RoomTypeRepository roomTypeRepository;
+    private final RoomRepository roomRepository;
 
     public List<PropertyDto> listProperties(User user) {
         List<Property> properties;
@@ -76,6 +85,7 @@ public class PropertyService {
         property.setIsActive(true);
 
         Property saved = propertyRepository.save(property);
+        seedDefaultRooms(saved);
         return mapToDto(saved);
     }
 
@@ -184,5 +194,58 @@ public class PropertyService {
                 .isActive(property.getIsActive())
                 .imageKeys(property.getImageKeys())
                 .build();
+    }
+
+    private void seedDefaultRooms(Property property) {
+        // Seed Room Types
+        RoomType stdType = new RoomType();
+        stdType.setProperty(property);
+        stdType.setName("Phòng Standard");
+        stdType.setCode("STD");
+        stdType.setDescription("Phòng tiêu chuẩn ấm cúng");
+        stdType.setBasePrice(BigDecimal.valueOf(300000));
+        stdType.setMaxOccupancy(2);
+        stdType.setBedCount(1);
+        stdType.setBedType("DOUBLE");
+        stdType.setArea(20.0);
+        stdType.setIsActive(true);
+        stdType.setTotalRooms(2);
+        stdType = roomTypeRepository.save(stdType);
+
+        RoomType dlxType = new RoomType();
+        dlxType.setProperty(property);
+        dlxType.setName("Phòng Deluxe");
+        dlxType.setCode("DLX");
+        dlxType.setDescription("Phòng sang trọng view đẹp");
+        dlxType.setBasePrice(BigDecimal.valueOf(500000));
+        dlxType.setMaxOccupancy(4);
+        dlxType.setBedCount(2);
+        dlxType.setBedType("QUEEN");
+        dlxType.setArea(35.0);
+        dlxType.setIsActive(true);
+        dlxType.setTotalRooms(2);
+        dlxType = roomTypeRepository.save(dlxType);
+
+        // Seed Rooms
+        createRoomEntity(property, stdType, "101", 1, 100.0, 1000.0, RoomView.STREET);
+        createRoomEntity(property, dlxType, "102", 1, 120.0, 2000.0, RoomView.GARDEN);
+        createRoomEntity(property, stdType, "201", 2, 100.0, 1000.0, RoomView.CITY);
+        createRoomEntity(property, dlxType, "202", 2, 120.0, 2000.0, RoomView.SEA);
+    }
+
+    private void createRoomEntity(Property property, RoomType type, String roomNumber, int floor, double water, double electric, RoomView view) {
+        Room room = new Room();
+        room.setProperty(property);
+        room.setRoomType(type);
+        room.setRoomNumber(roomNumber);
+        room.setFloor(floor);
+        room.setDescription("Phòng " + roomNumber + " thuộc loại " + type.getName());
+        room.setStatus(RoomStatus.AVAILABLE);
+        room.setInitialWaterIndex(water);
+        room.setInitialElectricIndex(electric);
+        room.setHasBalcony(floor > 1);
+        room.setHasWindow(true);
+        room.setViewType(view);
+        roomRepository.save(room);
     }
 }

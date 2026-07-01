@@ -110,8 +110,8 @@ public class PaymentService {
         // Đơn giản hóa: Trích xuất bằng regex hoặc string contains
         if (payload.contains("BK-")) {
             int index = payload.indexOf("BK-");
-            if (index != -1 && index + 15 <= payload.length()) {
-                bookingCode = payload.substring(index, index + 15); // Format: BK-YYYYMMDD-XXXX
+            if (index != -1 && index + 16 <= payload.length()) {
+                bookingCode = payload.substring(index, index + 16); // Format: BK-YYYYMMDD-XXXX
             }
         }
 

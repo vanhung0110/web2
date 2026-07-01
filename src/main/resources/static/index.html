@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HotelChain Pro — Testing Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/index.css">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <i class="fa-solid fa-hotel logo-icon"></i>
+                <h2>HotelChain <span class="accent-text">Pro</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-tab="dashboard-tab">
+                    <i class="fa-solid fa-chart-line"></i> <span>Tổng quan</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="auth-tab">
+                    <i class="fa-solid fa-lock"></i> <span>Xác thực & 2FA</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="properties-tab">
+                    <i class="fa-solid fa-city"></i> <span>Chi nhánh & Phòng</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="bookings-tab">
+                    <i class="fa-solid fa-calendar-check"></i> <span>Đặt phòng</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="payments-tab">
+                    <i class="fa-solid fa-credit-card"></i> <span>Thanh toán & QR</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="utility-tab">
+                    <i class="fa-solid fa-plug"></i> <span>Điện nước</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="staff-tab">
+                    <i class="fa-solid fa-user-tie"></i> <span>Nhân viên & Ca</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="reports-tab">
+                    <i class="fa-solid fa-file-invoice-dollar"></i> <span>Báo cáo</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="logs-tab">
+                    <i class="fa-solid fa-terminal"></i> <span>Real-time Logs</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="connection-status offline" id="websocket-status">
+                    <span class="status-dot"></span> <span class="status-text">WS Offline</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header Bar -->
+            <header class="main-header">
+                <div class="header-title">
+                    <h1 id="page-title">Tổng quan hệ thống</h1>
+                    <p class="subtitle">Trình kiểm thử API Backend tích hợp</p>
+                </div>
+                <div class="header-user-profile" id="user-profile-header">
+                    <span class="user-role-badge">Chưa đăng nhập</span>
+                    <span class="user-name">Khách</span>
+                </div>
+            </header>
+
+            <!-- Notification Banner -->
+            <div id="alert-banner" class="alert-banner hidden"></div>
+
+            <!-- Content Screens -->
+            <div class="content-body">
+                
+                <!-- 1. DASHBOARD TAB -->
+                <section class="tab-pane active" id="dashboard-tab">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon purple-bg"><i class="fa-solid fa-building"></i></div>
+                            <div class="stat-info">
+                                <h3>Chi nhánh active</h3>
+                                <p class="stat-value" id="dash-properties">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green-bg"><i class="fa-solid fa-bed"></i></div>
+                            <div class="stat-info">
+                                <h3>Công suất phòng</h3>
+                                <p class="stat-value" id="dash-occupancy">0%</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon blue-bg"><i class="fa-solid fa-money-bill-wave"></i></div>
+                            <div class="stat-info">
+                                <h3>Doanh thu hôm nay</h3>
+                                <p class="stat-value" id="dash-revenue">0 ₫</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dashboard-details grid-2">
+                        <div class="detail-panel">
+                            <h3><i class="fa-solid fa-bolt"></i> Sự kiện hệ thống mới nhất</h3>
+                            <div class="list-container" id="dash-recent-events">
+                                <p class="placeholder-text">Chưa nhận được sự kiện nào. Hãy kết nối WebSocket...</p>
+                            </div>
+                        </div>
+                        <div class="detail-panel">
+                            <h3><i class="fa-solid fa-circle-exclamation"></i> Hành động cần xử lý</h3>
+                            <div class="list-container" id="dash-pending-actions">
+                                <p class="placeholder-text">Hệ thống đang hoạt động ổn định.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. AUTH TAB -->
+                <section class="tab-pane" id="auth-tab">
+                    <div class="grid-2">
+                        <!-- Login Form -->
+                        <div class="form-panel">
+                            <h3><i class="fa-solid fa-sign-in-alt"></i> Đăng nhập hệ thống</h3>
+                            <form id="login-form">
+                                <div class="form-group">
+                                    <label>Tên đăng nhập (Email)</label>
+                                    <input type="text" id="login-username" value="superadmin" required placeholder="receptionist@hotelchain.vn">
+                                </div>
+                                <div class="form-group">
+                                    <label>Mật khẩu</label>
+                                    <input type="password" id="login-password" value="Admin@123456" required placeholder="Mật khẩu của bạn">
+                                </div>
+                                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-key"></i> Đăng nhập</button>
+                                <p class="text-xs text-secondary margin-top-xs" style="margin-top: 8px;">Tài khoản mặc định: <code style="color:var(--accent-purple)">superadmin</code> / <code style="color:var(--accent-purple)">Admin@123456</code></p>
+                            </form>
+                            
+                            <hr class="form-divider">
+                            
+                            <h3><i class="fa-solid fa-shield-halved"></i> Xác thực 2 bước (2FA)</h3>
+                            <div class="2fa-container" id="two-factor-setup-area">
+                                <p class="text-secondary">Bạn phải đăng nhập để thiết lập 2FA.</p>
+                                <button id="btn-setup-2fa" class="btn btn-secondary btn-sm" disabled>Kích hoạt 2FA (TOTP)</button>
+                                <div id="2fa-qr-code" class="hidden text-center margin-top-md">
+                                    <p class="text-sm">Quét mã QR sau bằng Google Authenticator hoặc ứng dụng OTP:</p>
+                                    <div class="qr-placeholder" id="qr-placeholder-2fa"></div>
+                                    <p class="text-xs margin-top-xs font-mono" id="secret-key-2fa"></p>
+                                    <div class="form-group margin-top-sm">
+                                        <input type="number" id="otp-2fa-verify" placeholder="Nhập mã OTP 6 số">
+                                    </div>
+                                    <button id="btn-verify-2fa" class="btn btn-success btn-sm">Xác thực OTP & Hoàn thành</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Token & User status -->
+                        <div class="form-panel">
+                            <h3><i class="fa-solid fa-ticket"></i> Trạng thái Session</h3>
+                            <div class="token-details">
+                                <div class="info-row">
+                                    <span class="info-label">Trạng thái:</span>
+                                    <span class="info-value text-danger" id="session-status">Chưa đăng nhập</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Access Token:</span>
+                                    <span class="info-value"><textarea id="token-textarea" class="textarea-readonly" readonly placeholder="Chưa có token"></textarea></span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Refresh Token:</span>
+                                    <span class="info-value"><textarea id="refresh-token-textarea" class="textarea-readonly" readonly placeholder="Chưa có token"></textarea></span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Vai trò hiện tại:</span>
+                                    <span class="info-value font-mono font-bold" id="session-role">-</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Danh sách chi nhánh được quản lý:</span>
+                                    <span class="info-value" id="session-properties">-</span>
+                                </div>
+                                <div class="margin-top-md">
+                                    <button id="btn-refresh-token" class="btn btn-secondary btn-sm" disabled><i class="fa-solid fa-rotate"></i> Làm mới token</button>
+                                    <button id="btn-logout" class="btn btn-danger btn-sm" disabled><i class="fa-solid fa-sign-out-alt"></i> Đăng xuất</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. PROPERTIES TAB -->
+                <section class="tab-pane" id="properties-tab">
+                    <div class="grid-3-1">
+                        <!-- Properties list & detail view -->
+                        <div class="detail-panel">
+                            <div class="panel-header-action">
+                                <h3><i class="fa-solid fa-list"></i> Danh sách chi nhánh</h3>
+                                <button class="btn btn-primary btn-sm" id="btn-show-create-property"><i class="fa-solid fa-plus"></i> Thêm chi nhánh</button>
+                            </div>
+                            <div class="properties-list-container margin-top-sm" id="properties-list">
+                                <p class="placeholder-text">Chưa đăng nhập hoặc không có dữ liệu chi nhánh.</p>
+                            </div>
+                            
+                            <!-- Rooms detail section -->
+                            <div class="rooms-container hidden" id="rooms-section">
+                                <div class="panel-header-action">
+                                    <h4 id="rooms-section-title">Danh sách phòng - Chi nhánh</h4>
+                                    <button class="btn btn-secondary btn-sm" id="btn-show-create-room"><i class="fa-solid fa-plus"></i> Thêm phòng</button>
+                                </div>
+                                <div class="floor-map-visualizer margin-top-sm" id="floor-map-area">
+                                    <!-- Render floor plan here -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Create/Edit forms -->
+                        <div class="form-panel hidden" id="property-form-panel">
+                            <h3 id="property-form-title">Tạo chi nhánh mới</h3>
+                            <form id="create-property-form">
+                                <div class="form-group">
+                                    <label>Tên chi nhánh</label>
+                                    <input type="text" id="prop-name" required placeholder="Nhà nghỉ Hoa Mai Q1">
+                                </div>
+                                <div class="form-group">
+                                    <label>Mã chi nhánh (không dấu, duy nhất)</label>
+                                    <input type="text" id="prop-code" required placeholder="HM-Q1-001">
+                                </div>
+                                <div class="form-group">
+                                    <label>Địa chỉ</label>
+                                    <input type="text" id="prop-address" required placeholder="123 Nguyễn Trãi, Bến Thành">
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Phường/Quận</label>
+                                        <input type="text" id="prop-district" placeholder="Quận 1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Thành phố</label>
+                                        <input type="text" id="prop-city" value="Hồ Chí Minh">
+                                    </div>
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Vĩ độ (Latitude)</label>
+                                        <input type="number" step="0.000001" id="prop-lat" value="10.776889">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Kinh độ (Longitude)</label>
+                                        <input type="number" step="0.000001" id="prop-lng" value="106.700806">
+                                    </div>
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Điện thoại</label>
+                                        <input type="text" id="prop-phone" placeholder="02812345678">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Email</label>
+                                        <input type="email" id="prop-email" placeholder="hoamai@gmail.com">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Loại hình lưu trú</label>
+                                    <select id="prop-type">
+                                        <option value="HOTEL">Hotel (Khách sạn)</option>
+                                        <option value="MOTEL" selected>Motel (Nhà nghỉ)</option>
+                                        <option value="GUESTHOUSE">Guesthouse</option>
+                                        <option value="HOSTEL">Hostel</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Đánh giá sao (1-5)</label>
+                                    <input type="number" id="prop-stars" min="1" max="5" value="2">
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-save"></i> Lưu chi nhánh</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. BOOKINGS TAB -->
+                <section class="tab-pane" id="bookings-tab">
+                    <div class="grid-3-1">
+                        <!-- Bookings list -->
+                        <div class="detail-panel">
+                            <div class="panel-header-action">
+                                <h3><i class="fa-solid fa-address-book"></i> Danh sách Booking</h3>
+                                <button class="btn btn-primary btn-sm" id="btn-show-create-booking"><i class="fa-solid fa-plus"></i> Tạo Booking mới</button>
+                            </div>
+                            <!-- Filter box -->
+                            <div class="filter-box margin-top-sm grid-4">
+                                <div class="form-group-sm">
+                                    <label>Trạng thái</label>
+                                    <select id="filter-booking-status">
+                                        <option value="">Tất cả</option>
+                                        <option value="PENDING">Chờ xử lý (Hold)</option>
+                                        <option value="CONFIRMED">Đã xác nhận (Confirmed)</option>
+                                        <option value="CHECKED_IN">Đang ở (Checked-in)</option>
+                                        <option value="CHECKED_OUT">Đã rời đi (Checked-out)</option>
+                                        <option value="CANCELLED">Đã hủy (Cancelled)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group-sm">
+                                    <label>Tìm kiếm</label>
+                                    <input type="text" id="filter-booking-query" placeholder="Tên / SĐT / Mã đặt phòng">
+                                </div>
+                                <div class="form-group-sm align-end">
+                                    <button class="btn btn-secondary btn-sm" id="btn-apply-booking-filter"><i class="fa-solid fa-filter"></i> Lọc</button>
+                                </div>
+                            </div>
+                            
+                            <div class="bookings-list-container margin-top-sm" id="bookings-list">
+                                <p class="placeholder-text font-italic">Chưa có dữ liệu đặt phòng.</p>
+                            </div>
+                        </div>
+
+                        <!-- Actions panel on booking -->
+                        <div class="form-panel hidden" id="booking-actions-panel">
+                            <h3><i class="fa-solid fa-cog"></i> Nghiệp vụ phòng</h3>
+                            <div id="booking-selected-details" class="margin-bottom-md">
+                                <!-- Render dynamically -->
+                            </div>
+                            
+                            <!-- Operations sections toggle based on state -->
+                            <div id="booking-ops-area">
+                                <!-- Buttons will change state -->
+                            </div>
+
+                            <!-- Operation Form Placeholders -->
+                            <!-- Confirm Form -->
+                            <div class="op-subform hidden" id="subform-confirm">
+                                <h4>Xác nhận đặt phòng</h4>
+                                <p class="text-sm">Chuyển trạng thái sang CONFIRMED và giữ phòng chính thức cho khách.</p>
+                                <button class="btn btn-success btn-sm btn-block margin-top-sm" id="btn-op-confirm-submit">Xác nhận đặt phòng</button>
+                            </div>
+                            
+                            <!-- Check-in Form -->
+                            <div class="op-subform hidden" id="subform-checkin">
+                                <h4>Quy trình Check-in</h4>
+                                <div class="form-group">
+                                    <label>Số CCCD/Hộ chiếu khách</label>
+                                    <input type="text" id="checkin-guest-id" placeholder="012345678901">
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Chỉ số nước ban đầu</label>
+                                        <input type="number" step="0.1" id="checkin-water" value="100.0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Chỉ số điện ban đầu</label>
+                                        <input type="number" step="0.1" id="checkin-electric" value="1000.0">
+                                    </div>
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Ảnh đồng hồ nước (MinIO Key)</label>
+                                        <input type="text" id="checkin-water-photo" placeholder="MinIO key">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Ảnh đồng hồ điện (MinIO Key)</label>
+                                        <input type="text" id="checkin-electric-photo" placeholder="MinIO key">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Tiền đặt cọc (VNĐ)</label>
+                                    <input type="number" id="checkin-deposit" value="500000">
+                                </div>
+                                <div class="form-group">
+                                    <label>Hình thức đặt cọc</label>
+                                    <select id="checkin-deposit-method">
+                                        <option value="CASH">Tiền mặt</option>
+                                        <option value="BANK_TRANSFER">Chuyển khoản</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-success btn-sm btn-block margin-top-sm" id="btn-op-checkin-submit"><i class="fa-solid fa-door-open"></i> Hoàn tất Check-in</button>
+                            </div>
+
+                            <!-- Check-out Form -->
+                            <div class="op-subform hidden" id="subform-checkout">
+                                <h4>Quy trình Check-out & Tạo hóa đơn</h4>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Chỉ số nước cuối kỳ</label>
+                                        <input type="number" step="0.1" id="checkout-water" value="112.5">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Chỉ số điện cuối kỳ</label>
+                                        <input type="number" step="0.1" id="checkout-electric" value="1045.2">
+                                    </div>
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Ảnh đồng hồ nước cuối (MinIO Key)</label>
+                                        <input type="text" id="checkout-water-photo" value="mock-water-end-key.jpg">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Ảnh đồng hồ điện cuối (MinIO Key)</label>
+                                        <input type="text" id="checkout-electric-photo" value="mock-electric-end-key.jpg">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Tình trạng phòng</label>
+                                    <select id="checkout-condition">
+                                        <option value="GOOD" selected>Bình thường (Good)</option>
+                                        <option value="DAMAGED">Hư hỏng tài sản (Damaged)</option>
+                                        <option value="NEEDS_CLEANING">Cần dọn dẹp thêm (Needs Cleaning)</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary btn-sm btn-block margin-top-sm" id="btn-op-checkout-submit"><i class="fa-solid fa-receipt"></i> Tính tiền & Check-out</button>
+                            </div>
+                            
+                            <!-- Invoice Receipt Area -->
+                            <div class="invoice-receipt hidden" id="invoice-receipt-area">
+                                <h4>Hóa đơn thanh toán</h4>
+                                <div id="invoice-details" class="margin-top-sm">
+                                    <!-- Rendered details -->
+                                </div>
+                                <div id="checkout-payment-qr-container" class="margin-top-md text-center hidden">
+                                    <p class="text-sm font-bold">Vui lòng quét QR chuyển khoản thanh toán:</p>
+                                    <div class="qr-image-wrapper margin-top-xs" id="checkout-qr-image-box">
+                                        <!-- Render dynamic generated QR -->
+                                    </div>
+                                    <button class="btn btn-secondary btn-sm margin-top-sm" id="btn-sim-webhook"><i class="fa-solid fa-robot"></i> Giả lập Ngân hàng chuyển tiền (Auto-Webhook)</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Create Booking Form overlay -->
+                    <div class="modal hidden" id="create-booking-modal">
+                        <div class="modal-content">
+                            <span class="close-modal" id="btn-close-booking-modal">&times;</span>
+                            <h3>Tạo Booking đặt phòng mới</h3>
+                            <form id="create-booking-form">
+                                <div class="form-group">
+                                    <label>Phòng kiểm tra (Chọn phòng trống)</label>
+                                    <select id="booking-room-select" required>
+                                        <!-- Rendered option values -->
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Họ tên khách hàng</label>
+                                    <input type="text" id="booking-guest-name" required value="Nguyễn Văn Test">
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Số điện thoại</label>
+                                        <input type="text" id="booking-guest-phone" required value="0987654321">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Email khách</label>
+                                        <input type="email" id="booking-guest-email" value="guest@example.com">
+                                    </div>
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Ngày Check-in dự kiến</label>
+                                        <input type="datetime-local" id="booking-checkin-plan" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Ngày Check-out dự kiến</label>
+                                        <input type="datetime-local" id="booking-checkout-plan" required>
+                                    </div>
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Số người lớn</label>
+                                        <input type="number" id="booking-adults" value="2" min="1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Số trẻ em</label>
+                                        <input type="number" id="booking-children" value="0" min="0">
+                                    </div>
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Đơn giá phòng/đêm (VNĐ)</label>
+                                        <input type="number" id="booking-rate" value="300000" step="50000">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Tiền đặt cọc trước (VNĐ)</label>
+                                        <input type="number" id="booking-deposit" value="100000" step="50000">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Yêu cầu đặc biệt</label>
+                                    <textarea id="booking-requests" placeholder="Khách muốn phòng có ban công..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-save"></i> Đăng ký đặt phòng</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. PAYMENTS TAB -->
+                <section class="tab-pane" id="payments-tab">
+                    <div class="grid-2">
+                        <!-- Bank Config section -->
+                        <div class="form-panel">
+                            <h3><i class="fa-solid fa-university"></i> Cấu hình Tài khoản Ngân hàng (VietQR)</h3>
+                            <form id="bank-config-form">
+                                <div class="form-group">
+                                    <label>Chi nhánh áp dụng</label>
+                                    <select id="bank-config-property-select" required>
+                                        <!-- Render list -->
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Tên chủ tài khoản ngân hàng (viết hoa không dấu)</label>
+                                    <input type="text" id="bank-holder" required placeholder="NGUYEN VAN A" value="NGUYEN VAN A">
+                                </div>
+                                <div class="form-group">
+                                    <label>Số tài khoản ngân hàng</label>
+                                    <input type="text" id="bank-number" required placeholder="1903657891001" value="1903657891001">
+                                </div>
+                                <div class="form-group">
+                                    <label>Chọn Ngân hàng</label>
+                                    <select id="bank-code-select">
+                                        <option value="TCB" selected>Techcombank (TCB)</option>
+                                        <option value="VCB">Vietcombank (VCB)</option>
+                                        <option value="MB">MB Bank (MB)</option>
+                                        <option value="BIDV">BIDV</option>
+                                        <option value="ACB">ACB</option>
+                                        <option value="VPB">VPBank</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Nội dung chuyển khoản mặc định</label>
+                                    <input type="text" id="bank-template" placeholder="THANH TOAN PHONG {BOOKING_CODE}" value="THANH TOAN PHONG {BOOKING_CODE}">
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group-checkbox">
+                                        <input type="checkbox" id="bank-req-photo" checked>
+                                        <label for="bank-req-photo">Bắt buộc chụp ảnh đồng hồ</label>
+                                    </div>
+                                    <div class="form-group-checkbox">
+                                        <input type="checkbox" id="bank-req-input" checked>
+                                        <label for="bank-req-input">Bắt buộc nhập số tay</label>
+                                    </div>
+                                </div>
+                                <div class="form-group-checkbox">
+                                    <input type="checkbox" id="bank-auto-webhook">
+                                    <label for="bank-auto-webhook">Bật tự động xác nhận qua webhook</label>
+                                </div>
+                                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Cập nhật cấu hình</button>
+                            </form>
+                        </div>
+                        
+                        <!-- QR Code Testing section -->
+                        <div class="form-panel">
+                            <h3><i class="fa-solid fa-qrcode"></i> Sinh mã QR kiểm thử & Webhook</h3>
+                            <div class="info-row">
+                                <span class="info-label">Mã QR tĩnh của chi nhánh đang chọn:</span>
+                                <div class="static-qr-container margin-top-xs text-center">
+                                    <div class="qr-placeholder" id="static-qr-placeholder">Cấu hình ngân hàng chưa được tạo</div>
+                                </div>
+                            </div>
+                            <hr class="form-divider">
+                            <h3>Giả lập gọi Webhook từ Cổng thanh toán</h3>
+                            <p class="text-sm">Giả lập một payload NAPAS gửi tới endpoint Webhook `/api/v1/payments/webhook` của backend để tự động xác nhận thanh toán.</p>
+                            <div class="form-group margin-top-sm">
+                                <label>Mã Booking cần giả lập thanh toán</label>
+                                <input type="text" id="webhook-sim-booking-code" placeholder="BK-YYYYMMDD-XXXX">
+                            </div>
+                            <button id="btn-trigger-webhook-mock" class="btn btn-secondary btn-block"><i class="fa-solid fa-robot"></i> Trích xuất và bắn Webhook</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. UTILITY TAB -->
+                <section class="tab-pane" id="utility-tab">
+                    <div class="grid-2">
+                        <!-- Pricing Config Form -->
+                        <div class="form-panel">
+                            <h3><i class="fa-solid fa-dollar-sign"></i> Cấu hình Đơn giá điện & nước</h3>
+                            <form id="utility-price-form">
+                                <div class="form-group">
+                                    <label>Chi nhánh áp dụng</label>
+                                    <select id="price-config-property-select" required>
+                                        <!-- Render properties -->
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Đơn giá nước (đồng/m³)</label>
+                                    <input type="number" id="price-water" value="15000">
+                                </div>
+                                <div class="form-group-checkbox margin-bottom-sm">
+                                    <input type="checkbox" id="price-use-fixed-electric" checked>
+                                    <label for="price-use-fixed-electric">Sử dụng giá điện cố định (Flat rate)</label>
+                                </div>
+                                <div class="form-group" id="fixed-electric-group">
+                                    <label>Giá điện cố định (đồng/kWh)</label>
+                                    <input type="number" id="price-electric-fixed" value="3500">
+                                </div>
+                                
+                                <div id="tiered-electric-group" class="hidden">
+                                    <h4>Đơn giá điện bậc thang (EVN) (đồng/kWh)</h4>
+                                    <div class="grid-2">
+                                        <div class="form-group">
+                                            <label>Bậc 1 (0-50 kWh)</label>
+                                            <input type="number" id="price-electric-t1" value="1728">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Bậc 2 (51-100 kWh)</label>
+                                            <input type="number" id="price-electric-t2" value="1786">
+                                        </div>
+                                    </div>
+                                    <div class="grid-2">
+                                        <div class="form-group">
+                                            <label>Bậc 3 (101-200 kWh)</label>
+                                            <input type="number" id="price-electric-t3" value="2074">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Bậc 4 (201-300 kWh)</label>
+                                            <input type="number" id="price-electric-t4" value="2612">
+                                        </div>
+                                    </div>
+                                    <div class="grid-2">
+                                        <div class="form-group">
+                                            <label>Bậc 5 (301-400 kWh)</label>
+                                            <input type="number" id="price-electric-t5" value="2919">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Bậc 6 (>400 kWh)</label>
+                                            <input type="number" id="price-electric-t6" value="3015">
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Lưu cấu hình giá</button>
+                            </form>
+                        </div>
+                        
+                        <!-- Upload EXIF simulation -->
+                        <div class="form-panel">
+                            <h3><i class="fa-solid fa-camera"></i> Giả lập Upload ảnh đồng hồ & Trích xuất</h3>
+                            <p class="text-sm">Trình upload này sẽ gửi Multipart File lên `/api/v1/utility/upload-photo` và lấy về kết quả Hash SHA-256 chống sửa đổi và vị trí EXIF.</p>
+                            
+                            <form id="utility-photo-form" enctype="multipart/form-data" class="margin-top-sm">
+                                <div class="form-group">
+                                    <label>Chọn Booking liên quan</label>
+                                    <select id="photo-booking-select" required>
+                                        <!-- Render bookings -->
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Loại đồng hồ</label>
+                                    <select id="photo-type">
+                                        <option value="WATER">WATER (Đồng hồ Nước)</option>
+                                        <option value="ELECTRIC">ELECTRIC (Đồng hồ Điện)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Thời điểm ghi nhận</label>
+                                    <select id="photo-period">
+                                        <option value="START">START (Đầu kỳ - Checkin)</option>
+                                        <option value="END">END (Cuối kỳ - Checkout)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Chọn tệp ảnh (Mẫu JPG/PNG)</label>
+                                    <input type="file" id="photo-file" accept="image/*" required>
+                                </div>
+                                <button type="submit" class="btn btn-secondary"><i class="fa-solid fa-cloud-arrow-up"></i> Upload & Validate EXIF</button>
+                            </form>
+                            
+                            <div class="result-box hidden margin-top-md" id="photo-upload-result">
+                                <h4>Kết quả phân tích EXIF & Hash:</h4>
+                                <pre id="photo-upload-json" class="json-output"></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nhập chỉ số & Tra cứu -->
+                    <div class="grid-2 margin-top-md" style="margin-top: 24px;">
+                        <!-- Form nhập chỉ số tay -->
+                        <div class="form-panel">
+                            <h3><i class="fa-solid fa-pen-to-square"></i> Nhập chỉ số điện nước thủ công (Ghi chỉ số)</h3>
+                            <p class="text-sm">Ghi nhận thủ công chỉ số ban đầu (Start) hoặc chỉ số cuối (End) của điện và nước cho một Booking.</p>
+                            <form id="utility-reading-form" style="margin-top: 16px;">
+                                <div class="form-group">
+                                    <label>Chọn Booking liên quan</label>
+                                    <select id="reading-booking-select" required>
+                                        <!-- Render bookings dynamically -->
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Thời điểm ghi nhận</label>
+                                    <select id="reading-period" required>
+                                        <option value="START">START (Đầu kỳ - Check-in)</option>
+                                        <option value="END">END (Cuối kỳ - Check-out)</option>
+                                    </select>
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Chỉ số Nước (m³)</label>
+                                        <input type="number" step="0.1" id="reading-water-index" required value="100.0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Chỉ số Điện (kWh)</label>
+                                        <input type="number" step="0.1" id="reading-electric-index" required value="1000.0">
+                                    </div>
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Ảnh đồng hồ nước (MinIO Key)</label>
+                                        <input type="text" id="reading-water-photo-key" placeholder="Ảnh nước (tùy chọn)">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Ảnh đồng hồ điện (MinIO Key)</label>
+                                        <input type="text" id="reading-electric-photo-key" placeholder="Ảnh điện (tùy chọn)">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Lưu chỉ số</button>
+                            </form>
+                        </div>
+
+                        <!-- Tra cứu & Quản lý trạng thái chỉ số -->
+                        <div class="form-panel">
+                            <h3><i class="fa-solid fa-magnifying-glass"></i> Tra cứu & Phê duyệt chỉ số Điện/Nước</h3>
+                            <div class="form-group">
+                                <label>Chọn Booking để xem chỉ số hiện tại</label>
+                                <div class="flex-row">
+                                    <select id="lookup-booking-select" style="flex: 1; margin-right: 8px;">
+                                        <!-- Render bookings dynamically -->
+                                    </select>
+                                    <button class="btn btn-secondary btn-sm" id="btn-lookup-readings" style="height: 38px; display: inline-flex; align-items: center; justify-content: center;"><i class="fa-solid fa-search"></i> Xem</button>
+                                </div>
+                            </div>
+
+                            <div class="readings-detail-box hidden" id="lookup-readings-box" style="margin-top: 16px;">
+                                <h4 class="text-purple font-bold">Chi tiết chỉ số Điện/Nước</h4>
+                                <div id="lookup-readings-content" style="margin-top: 12px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px;">
+                                    <!-- Rendered dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 7. STAFF TAB -->
+                <section class="tab-pane" id="staff-tab">
+                    <div class="grid-3-1">
+                        <div class="detail-panel">
+                            <div class="panel-header-action">
+                                <h3><i class="fa-solid fa-users"></i> Lịch biểu & Nhân sự chi nhánh</h3>
+                                <button class="btn btn-primary btn-sm" id="btn-show-create-staff"><i class="fa-solid fa-user-plus"></i> Thêm nhân viên</button>
+                            </div>
+                            
+                            <div class="staff-list-container margin-top-sm" id="staff-list">
+                                <p class="placeholder-text">Chưa có dữ liệu nhân viên.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-panel hidden" id="staff-form-panel">
+                            <h3>Tạo Nhân viên & Tài khoản</h3>
+                            <form id="create-staff-form">
+                                <div class="form-group">
+                                    <label>Chi nhánh làm việc</label>
+                                    <select id="staff-property-select" required></select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Họ tên nhân viên</label>
+                                    <input type="text" id="staff-name" required placeholder="Nguyễn Văn A">
+                                </div>
+                                <div class="form-group">
+                                    <label>Số điện thoại</label>
+                                    <input type="text" id="staff-phone" required placeholder="0901234567">
+                                </div>
+                                <div class="form-group">
+                                    <label>Địa chỉ Email (Sẽ dùng làm tài khoản đăng nhập)</label>
+                                    <input type="email" id="staff-email" required placeholder="staff@hotelchain.vn">
+                                </div>
+                                <div class="form-group">
+                                    <label>Vai trò (RBAC Role)</label>
+                                    <select id="staff-role">
+                                        <option value="RECEPTIONIST">RECEPTIONIST (Lễ tân)</option>
+                                        <option value="ACCOUNTANT">ACCOUNTANT (Kế toán)</option>
+                                        <option value="HOUSEKEEPING">HOUSEKEEPING (Buồng phòng)</option>
+                                        <option value="MAINTENANCE">MAINTENANCE (Kỹ thuật)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Địa chỉ liên hệ</label>
+                                    <input type="text" id="staff-address" placeholder="Quận 1, TPHCM">
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-save"></i> Tạo nhân viên</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 8. REPORTS TAB -->
+                <section class="tab-pane" id="reports-tab">
+                    <div class="grid-2">
+                        <div class="form-panel">
+                            <h3><i class="fa-solid fa-file-pdf"></i> Trích xuất Báo cáo thống kê</h3>
+                            <form id="report-generate-form">
+                                <div class="form-group">
+                                    <label>Chọn chi nhánh</label>
+                                    <select id="report-property-select" required></select>
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Từ ngày</label>
+                                        <input type="date" id="report-from" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Đến ngày</label>
+                                        <input type="date" id="report-to" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Phân nhóm theo (cho báo cáo Doanh thu)</label>
+                                    <select id="report-groupby">
+                                        <option value="DAILY">Theo Ngày (Daily)</option>
+                                        <option value="WEEKLY">Theo Tuần (Weekly)</option>
+                                        <option value="MONTHLY">Theo Tháng (Monthly)</option>
+                                    </select>
+                                </div>
+                                <div class="margin-top-md">
+                                    <button type="button" class="btn btn-secondary btn-sm" id="btn-view-report-revenue">Doanh thu (JSON)</button>
+                                    <button type="button" class="btn btn-secondary btn-sm" id="btn-view-report-occupancy">Công suất (JSON)</button>
+                                    <button type="button" class="btn btn-secondary btn-sm" id="btn-view-report-utility">Tiện ích (JSON)</button>
+                                </div>
+                                <hr class="form-divider">
+                                <h4>Xuất file tài liệu</h4>
+                                <div class="margin-top-sm">
+                                    <button type="button" class="btn btn-success btn-sm" id="btn-export-excel"><i class="fa-solid fa-file-excel"></i> Tải báo cáo Excel (.xlsx)</button>
+                                    <button type="button" class="btn btn-danger btn-sm" id="btn-export-pdf"><i class="fa-solid fa-file-pdf"></i> Tải báo cáo PDF (.pdf)</button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div class="form-panel">
+                            <h3>Kết quả truy vấn báo cáo</h3>
+                            <pre id="report-output-json" class="json-output">Chọn báo cáo để xem dữ liệu JSON...</pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 9. LOGS TAB -->
+                <section class="tab-pane" id="logs-tab">
+                    <div class="form-panel logs-panel">
+                        <div class="panel-header-action">
+                            <h3><i class="fa-solid fa-code"></i> Live Stream các sự kiện từ WebSocket STOMP Broker</h3>
+                            <div>
+                                <button class="btn btn-danger btn-sm" id="btn-clear-logs"><i class="fa-solid fa-trash"></i> Xóa bảng Log</button>
+                                <button class="btn btn-success btn-sm" id="btn-reconnect-ws"><i class="fa-solid fa-plug"></i> Kết nối lại WS</button>
+                            </div>
+                        </div>
+                        <p class="text-xs text-secondary margin-bottom-sm">Lắng nghe topic <code>/topic/property/{id}/events</code> và <code>/user/queue/notifications</code> để nhận sự kiện đặt phòng, thanh toán, checkin/out tự động.</p>
+                        <div class="terminal-container" id="terminal-logs">
+                            <div class="log-line system-msg">[Hệ thống] Trình kiểm thử WebSockets đã khởi động. Hãy đăng nhập để tự động kết nối STOMP.</div>
+                        </div>
+                    </div>
+                </section>
+                
+            </div>
+        </main>
+    </div>
+
+    <!-- SockJS and STOMP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

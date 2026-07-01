@@ -2,6 +2,7 @@ package com.hotelchain.pro.storage.service;
 
 import io.minio.*;
 import io.minio.http.Method;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +27,11 @@ public class MinioStorageService {
     private String bucketName;
 
     private final MinioClient minioClient;
+
+    @PostConstruct
+    public void init() {
+        ensureBucketExists();
+    }
 
     /**
      * Upload MultipartFile lên MinIO.

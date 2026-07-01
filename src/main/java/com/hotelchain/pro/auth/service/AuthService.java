@@ -77,6 +77,7 @@ public class AuthService {
 
         // Reset failed attempts on success
         userRepository.resetLoginAttempts(user.getId());
+        rateLimitService.resetLoginRateLimit(ipAddress, request.getUsername());
 
         // Update last login
         user.setLastLoginAt(LocalDateTime.now());

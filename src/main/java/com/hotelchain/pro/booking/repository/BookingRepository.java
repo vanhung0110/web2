@@ -63,7 +63,7 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
     @Query("""
             SELECT b FROM Booking b
             WHERE b.propertyId = :propertyId
-            AND DATE(b.checkOutPlan) = CURRENT_DATE
+            AND CAST(b.checkOutPlan AS date) = CURRENT_DATE
             AND b.status = 'CHECKED_IN'
             """)
     List<Booking> findTodayCheckouts(@Param("propertyId") UUID propertyId);
@@ -71,7 +71,7 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
     @Query("""
             SELECT b FROM Booking b
             WHERE b.propertyId = :propertyId
-            AND DATE(b.checkInPlan) = CURRENT_DATE
+            AND CAST(b.checkInPlan AS date) = CURRENT_DATE
             AND b.status IN ('CONFIRMED', 'CHECK_IN_READY')
             """)
     List<Booking> findTodayCheckIns(@Param("propertyId") UUID propertyId);

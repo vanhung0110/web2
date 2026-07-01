@@ -8,7 +8,7 @@ VALUES (
     gen_random_uuid(),
     'superadmin',
     'superadmin@hotelchain.vn',
-    '$2a$12$LnGHbULOb27uGX1qlUm7peRzwMmCkj93JLv7DpT7R2Rl0ECEq.A7e', -- Admin@123456
+    '$2b$12$E4fSa5TPZYAnHg/xPOkaG.3Io5FPuN5bCrnCnwYpSLXmq0Fu4Ccne', -- Admin@123456
     'Super Administrator',
     'SUPER_ADMIN',
     TRUE,

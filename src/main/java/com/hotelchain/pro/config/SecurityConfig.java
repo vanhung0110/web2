@@ -39,6 +39,13 @@ public class SecurityConfig {
     private final UserDetailsServiceImpl userDetailsService;
 
     private static final String[] PUBLIC_ENDPOINTS = {
+            "/",
+            "/index.html",
+            "/css/**",
+            "/js/**",
+            "/assets/**",
+            "/favicon.ico",
+            "/ws/**",
             "/api/v1/auth/login",
             "/api/v1/auth/refresh",
             "/api/v1/auth/forgot-password",

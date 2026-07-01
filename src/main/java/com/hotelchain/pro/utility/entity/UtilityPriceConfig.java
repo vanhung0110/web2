@@ -35,17 +35,17 @@ public class UtilityPriceConfig extends BaseEntity {
     private BigDecimal waterPricePerUnit = new BigDecimal("15000");
 
     // Giá điện theo bậc thang (theo quy định EVN)
-    @Column(precision = 15, scale = 2)
+    @Column(name = "electric_tier1_price", precision = 15, scale = 2)
     private BigDecimal electricTier1Price = new BigDecimal("1728");  // 0-50 kWh
-    @Column(precision = 15, scale = 2)
+    @Column(name = "electric_tier2_price", precision = 15, scale = 2)
     private BigDecimal electricTier2Price = new BigDecimal("1786");  // 51-100 kWh
-    @Column(precision = 15, scale = 2)
+    @Column(name = "electric_tier3_price", precision = 15, scale = 2)
     private BigDecimal electricTier3Price = new BigDecimal("2074");  // 101-200 kWh
-    @Column(precision = 15, scale = 2)
+    @Column(name = "electric_tier4_price", precision = 15, scale = 2)
     private BigDecimal electricTier4Price = new BigDecimal("2612");  // 201-300 kWh
-    @Column(precision = 15, scale = 2)
+    @Column(name = "electric_tier5_price", precision = 15, scale = 2)
     private BigDecimal electricTier5Price = new BigDecimal("2919");  // 301-400 kWh
-    @Column(precision = 15, scale = 2)
+    @Column(name = "electric_tier6_price", precision = 15, scale = 2)
     private BigDecimal electricTier6Price = new BigDecimal("3015");  // >400 kWh
 
     // Hoặc giá cố định (dành cho nhà nghỉ nhỏ)
