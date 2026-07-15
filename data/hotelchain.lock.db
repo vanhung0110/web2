@@ -1,0 +1,6 @@
+#FileLock
+#Wed Jul 15 15:06:10 ICT 2026
+hostName=MSI.lan
+id=19f64cfcce6150cc529aa24cced7d3053fc26a012fa
+method=file
+server=192.168.110.12\:53081
