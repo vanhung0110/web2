@@ -1,0 +1,14 @@
+.git
+.idea
+.vscode
+target/
+data/
+uploads/
+*.mv.db
+*.trace.db
+test_*.py
+test_*.ps1
+test_*.js
+Dockerfile
+render.yaml
+*.md
