@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
@@ -41,7 +42,7 @@ public class BookingService {
         long days = ChronoUnit.DAYS.between(request.getCheckInDate(), request.getCheckOutDate());
         if (days <= 0) days = 1;
         Double dailyRent = room.getDailyRent() != null ? room.getDailyRent().doubleValue() : 0.0;
-        Double totalPrice = days * dailyRent;
+        BigDecimal totalPrice = BigDecimal.valueOf(days * dailyRent);
 
         Booking booking = Booking.builder()
                 .room(room)
