@@ -3,427 +3,441 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Quản Lý Nhà Trọ</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Hệ Thống Quản Lý Nhà Trọ | Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/index.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
+<body class="dark-theme">
+    <!-- TOAST -->
+    <div id="toast" class="toast hidden"></div>
 
-    <!-- LOADING SPINNER -->
+    <!-- GLOBAL SPINNER -->
     <div id="global-spinner" class="modal-overlay hidden" style="z-index: 9999; flex-direction: column;">
         <div class="spinner"></div>
-        <div style="color: white; margin-top: 1rem; font-weight: bold;">Đang xử lý...</div>
+        <div style="color: var(--text-primary); margin-top: 1rem; font-weight: 500; letter-spacing: 1px;">Đang xử lý...</div>
     </div>
 
     <!-- 1. VIEW: LOGIN -->
-    <div id="view-login" class="login-container">
-        <div class="login-box">
-            <h2>Quản Lý Nhà Trọ</h2>
-            <form id="form-login">
-                <div class="form-group">
-                    <label>Số điện thoại</label>
-                    <input type="tel" id="login-phone" placeholder="Nhập số điện thoại của bạn" required>
+    <div id="view-login" class="view-container">
+        <div class="login-wrapper">
+            <div class="login-card glass-panel">
+                <div class="login-header">
+                    <div class="logo-icon"><i class="fa-solid fa-house-chimney"></i></div>
+                    <h2>NhaTro.Pro</h2>
+                    <p>Hệ thống quản lý nhà trọ thông minh</p>
                 </div>
-                <button type="submit" class="btn btn-primary btn-block">Đăng Nhập</button>
-            </form>
+                <form id="form-login" class="login-form">
+                    <div class="form-group">
+                        <label>Số điện thoại</label>
+                        <div class="input-with-icon">
+                            <i class="fa-solid fa-phone"></i>
+                            <input type="tel" id="login-phone" placeholder="Nhập số điện thoại của bạn..." required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block btn-lg">
+                        <span>Đăng nhập ngay</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+                <div class="login-footer">
+                    <p>Quản trị viên: 0962750432</p>
+                </div>
+            </div>
+            <div class="login-blob blob-1"></div>
+            <div class="login-blob blob-2"></div>
         </div>
     </div>
 
-    <!-- 2. VIEW: ADMIN APP -->
-    <div id="view-admin" class="app-container hidden">
-        <aside class="sidebar" id="admin-sidebar">
-            <div class="sidebar-header">
-                Admin Dashboard
-                <button id="btn-close-sidebar" class="mobile-only btn-icon"><i class="fas fa-times"></i></button>
-            </div>
-            <nav class="nav-menu">
-                <a class="nav-item active" data-target="admin-dashboard"><i class="fas fa-chart-pie"></i> Tổng quan</a>
-                <a class="nav-item" data-target="admin-branches"><i class="fas fa-building"></i> Quản lý cơ sở</a>
-                <a class="nav-item" data-target="admin-room-map"><i class="fas fa-th-large"></i> Sơ đồ phòng</a>
-                <li class="nav-item" data-target="admin-rooms"><i class="fas fa-door-open"></i> Quản lý phòng</li>
-                <li class="nav-item" data-target="admin-bookings"><i class="fas fa-calendar-check"></i> Đặt phòng (Ngắn hạn)</li>
-                <li class="nav-item" data-target="admin-tenants"><i class="fas fa-users"></i> Khách thuê (Tháng)</li>
-                <a class="nav-item" data-target="admin-reports"><i class="fas fa-file-invoice-dollar"></i> Duyệt báo cáo</a>
-                <a class="nav-item" data-target="admin-history"><i class="fas fa-history"></i> Lịch sử thu tiền</a>
-                <a class="nav-item" data-target="admin-settings"><i class="fas fa-cog"></i> Cài đặt chung</a>
-            </nav>
-            <div class="sidebar-footer">
-                <button id="btn-admin-logout" class="btn btn-outline btn-block"><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
-            </div>
-        </aside>
-        
-        <main class="main-content">
-            <div class="topbar">
-                <div class="flex items-center gap-4">
-                    <button id="btn-open-sidebar" class="mobile-only btn-icon"><i class="fas fa-bars"></i></button>
-                    <h2 id="admin-page-title">Tổng quan</h2>
-                </div>
-                <div class="user-info">Xin chào, <span id="admin-name">Admin</span></div>
-            </div>
-            <div class="content-body">
-                
-                <!-- Tab: Dashboard -->
-                <div id="admin-dashboard" class="tab-content">
-                    <div class="grid-3 mb-4">
-                        <div class="card text-center" style="margin-bottom: 0;">
-                            <h3 class="text-muted">Tổng số phòng</h3>
-                            <h2 style="font-size: 2.5rem; color: var(--primary);" id="dash-total-rooms">0</h2>
-                        </div>
-                        <div class="card text-center" style="margin-bottom: 0;">
-                            <h3 class="text-muted">Phòng đang trống</h3>
-                            <h2 style="font-size: 2.5rem; color: var(--secondary);" id="dash-empty-rooms">0</h2>
-                        </div>
-                        <div class="card text-center" style="margin-bottom: 0;">
-                            <h3 class="text-muted">Tổng số khách thuê</h3>
-                            <h2 style="font-size: 2.5rem; color: var(--primary);" id="dash-total-tenants">0</h2>
-                        </div>
+    <!-- 2. VIEW: ADMIN -->
+    <div id="view-admin" class="view-container hidden">
+        <div class="app-layout">
+            <!-- Sidebar -->
+            <aside id="admin-sidebar" class="sidebar glass-panel">
+                <div class="sidebar-header">
+                    <div class="logo">
+                        <i class="fa-solid fa-house-chimney"></i>
+                        <span>NhaTro.Pro</span>
                     </div>
-                    <div class="grid-2 mt-4">
-                        <div class="card">
-                            <h3 class="card-title mb-4">Doanh thu 6 tháng gần nhất</h3>
-                            <canvas id="revenue-chart"></canvas>
-                        </div>
-                        <div class="card">
-                            <h3 class="card-title mb-4">Báo cáo chờ duyệt</h3>
-                            <h2 style="font-size: 2.5rem; color: var(--danger);" id="dash-pending-reports">0</h2>
-                            <button id="btn-dash-go-reports" class="btn btn-outline btn-sm mt-4">Đi tới Duyệt báo cáo</button>
-                        </div>
+                    <button id="btn-close-sidebar" class="btn-icon mobile-only"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="sidebar-user">
+                    <div class="avatar"><i class="fa-solid fa-user-tie"></i></div>
+                    <div class="user-info">
+                        <span class="name" id="admin-name">Quản trị viên</span>
+                        <span class="role">Admin</span>
                     </div>
                 </div>
+                <nav class="sidebar-nav">
+                    <div class="nav-section">TỔNG QUAN</div>
+                    <a class="nav-item active" data-target="admin-dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+                    <a class="nav-item" data-target="admin-room-map"><i class="fa-solid fa-map-location-dot"></i> Sơ đồ phòng</a>
+                    
+                    <div class="nav-section">QUẢN LÝ</div>
+                    <a class="nav-item" data-target="admin-branches"><i class="fa-solid fa-building"></i> Cơ sở / Chi nhánh</a>
+                    <a class="nav-item" data-target="admin-rooms"><i class="fa-solid fa-door-closed"></i> Danh sách phòng</a>
+                    <a class="nav-item" data-target="admin-tenants"><i class="fa-solid fa-users"></i> Khách thuê</a>
+                    <a class="nav-item" data-target="admin-bookings"><i class="fa-solid fa-calendar-check"></i> Đặt cọc (Sắp tới)</a>
 
-                <!-- Tab: Branches -->
-                <div id="admin-branches" class="tab-content hidden">
-                    <div class="card">
-                        <div class="card-header flex-wrap">
-                            <h3 class="card-title">Danh sách Cơ sở</h3>
-                            <button id="btn-show-add-branch" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Thêm cơ sở</button>
+                    <div class="nav-section">TÀI CHÍNH</div>
+                    <a class="nav-item" data-target="admin-reports"><i class="fa-solid fa-file-invoice-dollar"></i> Chốt điện nước</a>
+                    <a class="nav-item" data-target="admin-history"><i class="fa-solid fa-clock-rotate-left"></i> Lịch sử thu tiền</a>
+                    
+                    <div class="nav-section">HỆ THỐNG</div>
+                    <a class="nav-item" data-target="admin-settings"><i class="fa-solid fa-gear"></i> Cấu hình giá & Bank</a>
+                </nav>
+                <div class="sidebar-footer">
+                    <button id="btn-admin-logout" class="btn btn-outline btn-block"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <header class="topbar glass-panel">
+                    <button id="btn-open-sidebar" class="btn-icon mobile-only"><i class="fa-solid fa-bars"></i></button>
+                    <h2 id="admin-page-title" class="page-title">Dashboard</h2>
+                    <div class="topbar-actions">
+                        <button class="btn-icon"><i class="fa-solid fa-bell"></i></button>
+                    </div>
+                </header>
+
+                <div class="content-wrapper">
+                    <!-- Tab: Dashboard -->
+                    <div id="admin-dashboard" class="tab-content">
+                        <div class="stats-grid">
+                            <div class="stat-card glass-panel">
+                                <div class="stat-icon" style="background: rgba(99,102,241,0.2); color: #818cf8;"><i class="fa-solid fa-door-open"></i></div>
+                                <div class="stat-info">
+                                    <span class="stat-label">Tổng số phòng</span>
+                                    <h3 class="stat-value" id="dash-total-rooms">0</h3>
+                                </div>
+                            </div>
+                            <div class="stat-card glass-panel">
+                                <div class="stat-icon" style="background: rgba(34,197,94,0.2); color: #4ade80;"><i class="fa-solid fa-check-circle"></i></div>
+                                <div class="stat-info">
+                                    <span class="stat-label">Phòng trống</span>
+                                    <h3 class="stat-value" id="dash-empty-rooms">0</h3>
+                                </div>
+                            </div>
+                            <div class="stat-card glass-panel">
+                                <div class="stat-icon" style="background: rgba(245,158,11,0.2); color: #fbbf24;"><i class="fa-solid fa-users"></i></div>
+                                <div class="stat-info">
+                                    <span class="stat-label">Khách đang thuê</span>
+                                    <h3 class="stat-value" id="dash-total-tenants">0</h3>
+                                </div>
+                            </div>
+                            <div class="stat-card glass-panel cursor-pointer" id="btn-dash-go-reports">
+                                <div class="stat-icon" style="background: rgba(239,68,68,0.2); color: #f87171;"><i class="fa-solid fa-file-invoice"></i></div>
+                                <div class="stat-info">
+                                    <span class="stat-label">Báo cáo chờ duyệt</span>
+                                    <h3 class="stat-value text-red" id="dash-pending-reports">0</h3>
+                                </div>
+                            </div>
                         </div>
-                        <div class="table-container">
-                            <table id="table-branches">
+                        <div class="chart-container glass-panel mt-16">
+                            <div class="section-header">
+                                <h3><i class="fa-solid fa-chart-line"></i> Biểu đồ doanh thu 6 tháng gần nhất</h3>
+                            </div>
+                            <canvas id="revenue-chart" height="80"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Room Map -->
+                    <div id="admin-room-map" class="tab-content hidden">
+                        <div class="toolbar glass-panel mb-16">
+                            <div class="filter-group">
+                                <select id="room-map-branch-filter" class="form-control" style="max-width: 250px;"></select>
+                                <button id="btn-refresh-room-map" class="btn btn-secondary"><i class="fa-solid fa-rotate"></i> Làm mới</button>
+                            </div>
+                            <div class="legend">
+                                <span class="legend-item"><span class="dot empty"></span> Trống</span>
+                                <span class="legend-item"><span class="dot occupied"></span> Đang thuê</span>
+                                <span class="legend-item"><span class="dot pending"></span> Chờ duyệt ĐN</span>
+                                <span class="legend-item"><span class="dot approved"></span> Chờ thu tiền</span>
+                                <span class="legend-item"><span class="dot booked"></span> Giữ chỗ/Cọc</span>
+                            </div>
+                        </div>
+                        <div class="room-map-grid" id="room-map-grid">
+                            <!-- Render from JS -->
+                        </div>
+                    </div>
+
+                    <!-- Tab: Branches -->
+                    <div id="admin-branches" class="tab-content hidden">
+                        <div class="toolbar glass-panel mb-16" style="justify-content: flex-end;">
+                            <button id="btn-show-add-branch" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Thêm Cơ Sở</button>
+                        </div>
+                        <div class="table-container glass-panel">
+                            <table id="table-branches" class="data-table">
                                 <thead>
                                     <tr>
-                                        <th>Tên cơ sở</th>
-                                        <th>Địa chỉ</th>
-                                        <th>Thao tác</th>
+                                        <th>Tên Cơ Sở</th>
+                                        <th>Địa Chỉ</th>
+                                        <th style="width: 150px; text-align: right;">Thao Tác</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
                     </div>
-                </div>
 
-                <!-- Tab: Room Map -->
-                <div id="admin-room-map" class="tab-content hidden">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Sơ đồ phòng trực quan</h3>
-                            <div class="flex gap-2 items-center">
-                                <label>Cơ sở:</label>
-                                <select id="room-map-branch-filter" class="form-control" style="width: 200px; padding: 0.25rem"></select>
-                                <button id="btn-refresh-room-map" class="btn btn-outline btn-sm">Làm mới</button>
-                            </div>
+                    <!-- Tab: Rooms -->
+                    <div id="admin-rooms" class="tab-content hidden">
+                        <div class="toolbar glass-panel mb-16" style="justify-content: space-between;">
+                            <select id="filter-room-status" class="form-control" style="width: 200px;">
+                                <option value="ALL">Tất cả trạng thái</option>
+                                <option value="EMPTY">Phòng trống</option>
+                                <option value="OCCUPIED">Đang cho thuê</option>
+                            </select>
+                            <button id="btn-show-add-room" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Thêm Phòng</button>
                         </div>
-                        
-                        <div class="room-map-legend mb-4 flex gap-4 text-sm flex-wrap">
-                            <div class="flex items-center gap-1"><span class="legend-box" style="background: var(--success); width: 16px; height: 16px; display: inline-block; border-radius: 4px;"></span> Trống</div>
-                            <div class="flex items-center gap-1"><span class="legend-box" style="background: #9333ea; width: 16px; height: 16px; display: inline-block; border-radius: 4px;"></span> Đang thuê ngày (Khách sạn)</div>
-                            <div class="flex items-center gap-1"><span class="legend-box" style="background: var(--danger); width: 16px; height: 16px; display: inline-block; border-radius: 4px;"></span> Đang ở (Chưa có điện nước)</div>
-                            <div class="flex items-center gap-1"><span class="legend-box" style="background: var(--warning); width: 16px; height: 16px; display: inline-block; border-radius: 4px;"></span> Chờ duyệt báo cáo</div>
-                            <div class="flex items-center gap-1"><span class="legend-box" style="background: var(--primary); width: 16px; height: 16px; display: inline-block; border-radius: 4px;"></span> Chờ thu tiền</div>
-                        </div>
-
-                        <div id="room-map-grid" class="room-map-grid">
-                            <!-- Các block phòng sẽ được JS render ở đây -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tab: Bookings -->
-                <div id="admin-bookings" class="tab-content hidden">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Danh sách Đặt phòng (Ngắn hạn)</h3>
-                            <div class="flex gap-4">
-                                <button onclick="openAddBookingModal()" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Tạo Booking</button>
-                            </div>
-                        </div>
-                        <div class="table-container">
-                            <table id="table-bookings">
+                        <div class="table-container glass-panel">
+                            <table id="table-rooms" class="data-table">
                                 <thead>
                                     <tr>
                                         <th>Phòng</th>
-                                        <th>Khách hàng</th>
-                                        <th>Ngày nhận/trả</th>
-                                        <th>Tổng tiền</th>
-                                        <th>Trạng thái</th>
-                                        <th>Thao tác</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Bookings will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tab: Rooms -->
-                <div id="admin-rooms" class="tab-content hidden">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Danh sách phòng</h3>
-                            <div class="flex gap-4">
-                                <select id="filter-room-status" style="width: auto;">
-                                    <option value="ALL">Tất cả</option>
-                                    <option value="EMPTY">Trống</option>
-                                    <option value="OCCUPIED">Đã có người</option>
-                                </select>
-                                <button id="btn-show-add-room" class="btn btn-primary btn-sm">Thêm phòng mới</button>
-                            </div>
-                        </div>
-                        <div class="table-container">
-                            <table id="table-rooms">
-                                <thead>
-                                    <tr>
-                                        <th>Số phòng</th>
                                         <th>Tầng</th>
-                                        <th>Giá thuê (VNĐ)</th>
-                                        <th>Trạng thái</th>
-                                        <th>Thao tác</th>
+                                        <th>Giá Thuê (Tháng/Ngày)</th>
+                                        <th>Trạng Thái</th>
+                                        <th style="width: 150px; text-align: right;">Thao Tác</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
                     </div>
-                </div>
 
-                <!-- Tab: Tenants -->
-                <div id="admin-tenants" class="tab-content hidden">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Danh sách người thuê</h3>
-                            <button id="btn-show-add-tenant" class="btn btn-primary btn-sm">Thêm người thuê</button>
+                    <!-- Tab: Tenants -->
+                    <div id="admin-tenants" class="tab-content hidden">
+                        <div class="toolbar glass-panel mb-16" style="justify-content: flex-end;">
+                            <button id="btn-show-add-tenant" class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> Thêm Khách Thuê</button>
                         </div>
-                        <div class="table-container">
-                            <table id="table-tenants">
+                        <div class="table-container glass-panel">
+                            <table id="table-tenants" class="data-table">
                                 <thead>
                                     <tr>
                                         <th>Phòng</th>
-                                        <th>Tên khách</th>
-                                        <th>Số ĐT</th>
-                                        <th>Ngày chuyển vào</th>
-                                        <th>Thao tác</th>
+                                        <th>Họ Tên</th>
+                                        <th>Số Điện Thoại</th>
+                                        <th>Ngày Thuê</th>
+                                        <th style="width: 120px; text-align: right;">Thao Tác</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
                     </div>
-                </div>
 
-                <!-- Tab: Reports -->
-                <div id="admin-reports" class="tab-content hidden">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Báo cáo điện nước chờ duyệt</h3>
-                            <button id="btn-refresh-reports" class="btn btn-outline btn-sm">Làm mới</button>
+                    <!-- Tab: Bookings -->
+                    <div id="admin-bookings" class="tab-content hidden">
+                        <div class="empty-state glass-panel">
+                            <div class="empty-icon"><i class="fa-solid fa-person-digging"></i></div>
+                            <h3>Tính năng Đặt Cọc đang phát triển</h3>
+                            <p>Tính năng quản lý đặt cọc và giữ chỗ sẽ sớm ra mắt trong bản cập nhật tới.</p>
+                            <button class="btn btn-primary mt-16" onclick="document.getElementById('modal-add-booking').classList.remove('hidden')">Mở Form Mẫu (Demo)</button>
                         </div>
-                        <div class="table-container">
-                            <table id="table-reports">
+                    </div>
+
+                    <!-- Tab: Reports (Pending) -->
+                    <div id="admin-reports" class="tab-content hidden">
+                        <div class="toolbar glass-panel mb-16" style="justify-content: space-between;">
+                            <h3 class="m-0 text-gradient"><i class="fa-solid fa-clipboard-check"></i> Chờ duyệt & Thu tiền</h3>
+                            <button id="btn-refresh-reports" class="btn btn-secondary"><i class="fa-solid fa-rotate"></i> Làm mới</button>
+                        </div>
+                        <div class="table-container glass-panel">
+                            <table id="table-reports" class="data-table">
                                 <thead>
                                     <tr>
-                                        <th>Kỳ báo cáo</th>
+                                        <th>Kỳ Báo Cáo</th>
                                         <th>Phòng</th>
                                         <th>Nước (Cũ -> Mới)</th>
                                         <th>Điện (Cũ -> Mới)</th>
-                                        <th>Tổng tiền</th>
-                                        <th>Thao tác</th>
+                                        <th>Tổng Tiền</th>
+                                        <th style="width: 180px; text-align: right;">Thao Tác</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
                     </div>
-                </div>
 
-                <!-- Tab: History -->
-                <div id="admin-history" class="tab-content hidden">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Lịch sử hóa đơn đã thu tiền</h3>
-                            <button id="btn-refresh-history-admin" class="btn btn-outline btn-sm">Làm mới</button>
+                    <!-- Tab: History (Paid) -->
+                    <div id="admin-history" class="tab-content hidden">
+                        <div class="toolbar glass-panel mb-16" style="justify-content: space-between;">
+                            <h3 class="m-0 text-muted"><i class="fa-solid fa-history"></i> Hóa đơn đã thanh toán</h3>
+                            <button id="btn-refresh-history-admin" class="btn btn-secondary"><i class="fa-solid fa-rotate"></i> Làm mới</button>
                         </div>
-                        <div class="table-container">
-                            <table id="table-history">
+                        <div class="table-container glass-panel">
+                            <table id="table-history" class="data-table">
                                 <thead>
                                     <tr>
-                                        <th>Kỳ báo cáo</th>
+                                        <th>Kỳ Báo Cáo</th>
                                         <th>Phòng</th>
-                                        <th>Người nộp</th>
-                                        <th>Tổng tiền</th>
-                                        <th>Ngày thanh toán</th>
+                                        <th>Khách Thuê</th>
+                                        <th>Tổng Tiền</th>
+                                        <th>Ngày Thanh Toán</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
                     </div>
-                </div>
 
-                <!-- Tab: Settings -->
-                <div id="admin-settings" class="tab-content hidden">
-                    <div class="card" style="max-width: 500px;">
-                        <div class="card-header">
-                            <h3 class="card-title">Cấu hình đơn giá</h3>
+                    <!-- Tab: Settings -->
+                    <div id="admin-settings" class="tab-content hidden">
+                        <div class="settings-grid">
+                            <div class="settings-card glass-panel">
+                                <div class="section-header">
+                                    <h3><i class="fa-solid fa-bolt"></i> Cấu Hình Giá Điện Nước & Phí</h3>
+                                </div>
+                                <form id="form-settings">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Giá Điện (VNĐ/kWh) *</label>
+                                            <input type="text" id="setting-electric" class="number-format" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Giá Nước (VNĐ/m3 hoặc người) *</label>
+                                            <input type="text" id="setting-water" class="number-format" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Phí Rác (VNĐ/tháng)</label>
+                                            <input type="text" id="setting-trash" class="number-format">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Phí Internet (VNĐ/tháng)</label>
+                                            <input type="text" id="setting-internet" class="number-format">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mt-16"><i class="fa-solid fa-save"></i> Lưu bảng giá</button>
+                                </form>
+                            </div>
+                            
+                            <div class="settings-card glass-panel">
+                                <div class="section-header">
+                                    <h3><i class="fa-solid fa-qrcode"></i> Cấu Hình Ngân Hàng (VietQR)</h3>
+                                </div>
+                                <form id="form-settings-bank">
+                                    <div class="form-group">
+                                        <label>Ngân Hàng (Mã BIN hoặc Tên viết tắt, VD: MB, VCB)</label>
+                                        <input type="text" id="setting-bank-name" placeholder="MB">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Số Tài Khoản</label>
+                                        <input type="text" id="setting-bank-account" placeholder="0987654321">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Tên Chủ Tài Khoản</label>
+                                        <input type="text" id="setting-account-name" placeholder="NGUYEN VAN A">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mt-16"><i class="fa-solid fa-save"></i> Lưu thông tin QR</button>
+                                </form>
+                            </div>
                         </div>
-                        <form id="form-settings">
-                            <div class="form-group">
-                                <label>Giá nước (VNĐ / m3)</label>
-                                <input type="text" class="number-format" id="setting-water" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Giá điện (VNĐ / kWh)</label>
-                                <input type="text" class="number-format" id="setting-electric" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Phí Internet (VNĐ / Tháng)</label>
-                                <input type="text" class="number-format" id="setting-internet" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Phí Vệ sinh/Rác (VNĐ / Tháng)</label>
-                                <input type="text" class="number-format" id="setting-trash" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Lưu cấu hình</button>
-                        </form>
-                    </div>
-                    <div class="card" style="max-width: 500px;">
-                        <div class="card-header">
-                            <h3 class="card-title">Cấu hình Thanh toán (VietQR)</h3>
-                        </div>
-                        <form id="form-settings-bank">
-                            <div class="form-group">
-                                <label>Tên ngân hàng (VD: MB, VCB)</label>
-                                <input type="text" id="setting-bank-name" placeholder="MB">
-                            </div>
-                            <div class="form-group">
-                                <label>Số tài khoản</label>
-                                <input type="text" id="setting-bank-account" placeholder="123456789">
-                            </div>
-                            <div class="form-group">
-                                <label>Tên chủ tài khoản</label>
-                                <input type="text" id="setting-account-name" placeholder="NGUYEN VAN A">
-                            </div>
-                            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Lưu thông tin NH</button>
-                        </form>
                     </div>
                 </div>
-
-            </div>
-        </main>
+            </main>
+        </div>
     </div>
 
-    <!-- 3. VIEW: USER APP -->
-    <div id="view-user" class="app-container hidden" style="flex-direction: column;">
-        <div class="topbar">
-            <h2>Phòng: <span id="user-room-number">...</span></h2>
-            <div class="flex items-center gap-4">
-                <span id="user-name">User</span>
-                <button id="btn-user-logout" class="btn btn-outline btn-sm">Đăng xuất</button>
-            </div>
-        </div>
-        <div class="content-body" style="flex: 1; overflow-y: auto;">
-            
-            <div class="grid-2">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Gửi báo cáo tháng này</h3>
+    <!-- 3. VIEW: USER (TENANT APP) -->
+    <div id="view-user" class="view-container hidden">
+        <div class="tenant-app">
+            <header class="tenant-header glass-panel">
+                <div class="tenant-info">
+                    <div class="avatar"><i class="fa-solid fa-user"></i></div>
+                    <div>
+                        <h3 id="user-name">Khách thuê</h3>
+                        <p>Phòng: <strong id="user-room-number" class="text-primary">--</strong></p>
                     </div>
+                </div>
+                <button id="btn-user-logout" class="btn-icon"><i class="fa-solid fa-right-from-bracket"></i></button>
+            </header>
+
+            <div class="tenant-content mt-16">
+                <!-- Submit Report Section -->
+                <div class="tenant-card glass-panel">
+                    <h3 class="section-title"><i class="fa-solid fa-pen-to-square"></i> Chốt chỉ số điện nước</h3>
                     <form id="form-submit-report">
-                        <div class="grid-2">
+                        <div class="form-row">
                             <div class="form-group">
                                 <label>Tháng</label>
-                                <input type="number" id="report-month" min="1" max="12" required>
+                                <select id="report-month" class="form-control" required></select>
                             </div>
                             <div class="form-group">
                                 <label>Năm</label>
-                                <input type="number" id="report-year" required>
-                            </div>
-                        </div>
-                        
-                        <div class="grid-2">
-                            <div class="form-group">
-                                <label>Chỉ số nước cũ</label>
-                                <input type="text" class="number-format" id="report-water-old" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Chỉ số nước mới</label>
-                                <input type="text" class="number-format" id="report-water-new" required>
+                                <input type="number" id="report-year" class="form-control" required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Ảnh đồng hồ nước</label>
-                            <input type="file" id="report-water-file" accept="image/*" required>
-                        </div>
-
-                        <div class="grid-2 mt-4">
-                            <div class="form-group">
-                                <label>Chỉ số điện cũ</label>
-                                <input type="text" class="number-format" id="report-electric-old" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Chỉ số điện mới</label>
-                                <input type="text" class="number-format" id="report-electric-new" required>
+                            <div class="info-box">
+                                <div class="info-row"><span>Chỉ số NƯỚC cũ:</span><strong id="report-water-old">0</strong></div>
+                                <div class="info-row"><span>Chỉ số ĐIỆN cũ:</span><strong id="report-electric-old">0</strong></div>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Ảnh đồng hồ điện</label>
-                            <input type="file" id="report-electric-file" accept="image/*" required>
+                            <label>Chỉ số NƯỚC mới *</label>
+                            <input type="number" step="0.1" id="report-water-new" class="form-control" required>
                         </div>
-                        
-                        <div class="form-group mt-4">
-                            <label>Ghi chú (nếu có)</label>
-                            <textarea id="report-note"></textarea>
+                        <div class="form-group">
+                            <label>Ảnh chụp đồng hồ Nước *</label>
+                            <input type="file" id="report-water-file" class="form-control" accept="image/*" required>
                         </div>
-
-                        <button type="submit" class="btn btn-primary btn-block" id="btn-submit-report">Gửi báo cáo</button>
+                        <div class="form-group mt-16">
+                            <label>Chỉ số ĐIỆN mới *</label>
+                            <input type="number" step="0.1" id="report-electric-new" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Ảnh chụp đồng hồ Điện *</label>
+                            <input type="file" id="report-electric-file" class="form-control" accept="image/*" required>
+                        </div>
+                        <div class="form-group mt-16">
+                            <label>Ghi chú (Nếu có)</label>
+                            <textarea id="report-note" class="form-control" rows="2"></textarea>
+                        </div>
+                        <button type="submit" id="btn-submit-report" class="btn btn-primary btn-block mt-16">
+                            <i class="fa-solid fa-paper-plane"></i> Gửi báo cáo
+                        </button>
                     </form>
                 </div>
 
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Lịch sử hóa đơn</h3>
-                        <button id="btn-refresh-history" class="btn btn-outline btn-sm">Làm mới</button>
+                <!-- History Section -->
+                <div class="tenant-card glass-panel mt-16">
+                    <div class="flex-between align-center mb-16">
+                        <h3 class="section-title m-0"><i class="fa-solid fa-list-check"></i> Hóa đơn của tôi</h3>
+                        <button id="btn-refresh-history" class="btn-icon text-muted"><i class="fa-solid fa-rotate"></i></button>
                     </div>
-                    <div id="user-history-list" style="display: flex; flex-direction: column; gap: 1rem;">
-                        <!-- History items injected here -->
+                    <div id="user-history-list" class="history-list">
+                        <!-- Rendered by JS -->
+                        <div class="empty-state text-sm">Chưa có hóa đơn nào.</div>
                     </div>
                 </div>
             </div>
-            
         </div>
     </div>
 
-    <!-- MODALS -->
-
-    <!-- Add Branch Modal -->
+    <!-- MODALS (Hidden by default) -->
+    
+    <!-- Modal Add Branch -->
     <div id="modal-add-branch" class="modal-overlay hidden">
-        <div class="modal-content">
-            <button type="button" class="modal-close-btn btn-close-modal">&times;</button>
-            <h3 class="mb-4">Thêm cơ sở mới</h3>
-            <form id="form-add-branch">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3>Thêm Cơ Sở Mới</h3>
+                <button class="btn-close-modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="form-add-branch" class="modal-body">
                 <div class="form-group">
-                    <label>Tên cơ sở</label>
+                    <label>Tên cơ sở *</label>
                     <input type="text" id="add-branch-name" required>
                 </div>
                 <div class="form-group">
                     <label>Địa chỉ</label>
                     <input type="text" id="add-branch-address">
                 </div>
-                <div class="flex justify-between mt-4">
+                <div class="modal-actions mt-16">
                     <button type="button" class="btn btn-outline btn-close-modal">Hủy</button>
                     <button type="submit" class="btn btn-primary">Lưu</button>
                 </div>
@@ -431,56 +445,64 @@
         </div>
     </div>
 
-    <!-- Edit Branch Modal -->
+    <!-- Modal Edit Branch -->
     <div id="modal-edit-branch" class="modal-overlay hidden">
-        <div class="modal-content">
-            <button type="button" class="modal-close-btn btn-close-modal">&times;</button>
-            <h3 class="mb-4">Sửa cơ sở</h3>
-            <form id="form-edit-branch">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3>Cập Nhật Cơ Sở</h3>
+                <button class="btn-close-modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="form-edit-branch" class="modal-body">
                 <input type="hidden" id="edit-branch-id">
                 <div class="form-group">
-                    <label>Tên cơ sở</label>
+                    <label>Tên cơ sở *</label>
                     <input type="text" id="edit-branch-name" required>
                 </div>
                 <div class="form-group">
                     <label>Địa chỉ</label>
                     <input type="text" id="edit-branch-address">
                 </div>
-                <div class="flex justify-between mt-4">
+                <div class="modal-actions mt-16">
                     <button type="button" class="btn btn-outline btn-close-modal">Hủy</button>
-                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    <button type="submit" class="btn btn-primary">Cập nhật</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Add Room Modal -->
+    <!-- Modal Add Room -->
     <div id="modal-add-room" class="modal-overlay hidden">
-        <div class="modal-content">
-            <button type="button" class="modal-close-btn btn-close-modal">&times;</button>
-            <h3 class="mb-4">Thêm phòng mới</h3>
-            <form id="form-add-room">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3>Thêm Phòng Mới</h3>
+                <button class="btn-close-modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="form-add-room" class="modal-body">
                 <div class="form-group">
-                    <label>Thuộc cơ sở</label>
+                    <label>Thuộc cơ sở *</label>
                     <select id="add-room-branch" required></select>
                 </div>
-                <div class="form-group">
-                    <label>Số phòng</label>
-                    <input type="text" id="add-room-number" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tên / Số phòng *</label>
+                        <input type="text" id="add-room-number" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tầng</label>
+                        <input type="number" id="add-room-floor" value="1" min="1">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Tầng</label>
-                    <input type="number" id="add-room-floor" value="1" required>
+                <div class="form-row mt-8">
+                    <div class="form-group">
+                        <label>Giá thuê tháng (VNĐ) *</label>
+                        <input type="text" id="add-room-rent" class="number-format" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Giá thuê ngày (VNĐ)</label>
+                        <input type="text" id="add-room-daily-rent" class="number-format" value="0">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Giá thuê (VNĐ/tháng)</label>
-                    <input type="text" class="number-format" id="add-room-rent" required>
-                </div>
-                <div class="form-group">
-                    <label>Giá thuê ngắn hạn (VNĐ/ngày)</label>
-                    <input type="text" class="number-format" id="add-room-daily-rent" value="0" required>
-                </div>
-                <div class="flex justify-between mt-4">
+                <div class="modal-actions mt-16">
                     <button type="button" class="btn btn-outline btn-close-modal">Hủy</button>
                     <button type="submit" class="btn btn-primary">Lưu</button>
                 </div>
@@ -488,228 +510,228 @@
         </div>
     </div>
 
-    <!-- Edit Room Modal -->
+    <!-- Modal Edit Room -->
     <div id="modal-edit-room" class="modal-overlay hidden">
-        <div class="modal-content">
-            <button type="button" class="modal-close-btn btn-close-modal">&times;</button>
-            <h3 class="mb-4">Sửa thông tin phòng</h3>
-            <form id="form-edit-room">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3>Sửa Thông Tin Phòng</h3>
+                <button class="btn-close-modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="form-edit-room" class="modal-body">
                 <input type="hidden" id="edit-room-id">
                 <div class="form-group">
-                    <label>Thuộc cơ sở</label>
+                    <label>Thuộc cơ sở *</label>
                     <select id="edit-room-branch" required></select>
                 </div>
-                <div class="form-group">
-                    <label>Số phòng</label>
-                    <input type="text" id="edit-room-number" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tên / Số phòng *</label>
+                        <input type="text" id="edit-room-number" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tầng</label>
+                        <input type="number" id="edit-room-floor" min="1">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Tầng</label>
-                    <input type="number" id="edit-room-floor" required>
+                <div class="form-row mt-8">
+                    <div class="form-group">
+                        <label>Giá thuê tháng (VNĐ) *</label>
+                        <input type="text" id="edit-room-rent" class="number-format" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Giá thuê ngày (VNĐ)</label>
+                        <input type="text" id="edit-room-daily-rent" class="number-format">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Giá thuê (VNĐ/tháng)</label>
-                    <input type="text" class="number-format" id="edit-room-rent" required>
-                </div>
-                <div class="form-group">
-                    <label>Giá thuê ngắn hạn (VNĐ/ngày)</label>
-                    <input type="text" class="number-format" id="edit-room-daily-rent" required>
-                </div>
-                <div class="flex justify-between mt-4">
+                <div class="modal-actions mt-16">
                     <button type="button" class="btn btn-outline btn-close-modal">Hủy</button>
-                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    <button type="submit" class="btn btn-primary">Cập nhật</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Add Tenant Modal -->
+    <!-- Modal Add Tenant -->
     <div id="modal-add-tenant" class="modal-overlay hidden">
-        <div class="modal-content">
-            <button type="button" class="modal-close-btn btn-close-modal">&times;</button>
-            <h3 class="mb-4">Thêm người thuê</h3>
-            <form id="form-add-tenant">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3>Thêm Khách Thuê Mới</h3>
+                <button class="btn-close-modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="form-add-tenant" class="modal-body">
                 <div class="form-group">
-                    <label>Số điện thoại</label>
-                    <input type="tel" id="add-tenant-phone" required>
+                    <label>Chọn phòng (chỉ hiện phòng trống) *</label>
+                    <select id="add-tenant-room" required></select>
                 </div>
                 <div class="form-group">
-                    <label>Họ và tên</label>
+                    <label>Họ tên khách *</label>
                     <input type="text" id="add-tenant-name" required>
                 </div>
                 <div class="form-group">
-                    <label>Chọn phòng</label>
-                    <select id="add-tenant-room" required></select>
+                    <label>Số điện thoại (dùng để đăng nhập) *</label>
+                    <input type="tel" id="add-tenant-phone" placeholder="VD: 0912345678" required>
                 </div>
-                <div class="flex justify-between mt-4">
+                <div class="alert alert-info mt-8">
+                    <i class="fa-solid fa-circle-info"></i> Khách thuê sẽ dùng số điện thoại này để đăng nhập vào app.
+                </div>
+                <div class="modal-actions mt-16">
                     <button type="button" class="btn btn-outline btn-close-modal">Hủy</button>
-                    <button type="submit" class="btn btn-primary">Lưu</button>
+                    <button type="submit" class="btn btn-primary">Tạo Khách Thuê</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Review Report Modal -->
+    <!-- Modal Review Report -->
     <div id="modal-review-report" class="modal-overlay hidden">
-        <div class="modal-content" style="max-width: 600px;">
-            <button type="button" class="modal-close-btn btn-close-modal">&times;</button>
-            <h3 class="mb-4">Duyệt báo cáo</h3>
-            <input type="hidden" id="review-report-id">
-            
-            <div class="grid-2 mb-4">
-                <div>
-                    <strong>Chỉ số nước:</strong> <span id="review-water"></span><br>
-                    <img id="review-water-img" class="img-preview mt-2" src="" alt="Nước" style="cursor: pointer; border: 1px solid var(--border-color); width: 100%; max-height: 200px; object-fit: cover;" onclick="window.open(this.src, '_blank')">
+        <div class="modal-content glass-panel" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>Chi Tiết Báo Cáo & Tính Tiền</h3>
+                <button class="btn-close-modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="review-report-id">
+                
+                <div class="meter-photos-grid">
+                    <div class="meter-photo-box">
+                        <label>Đồng hồ Nước</label>
+                        <p class="meter-text" id="review-water">--</p>
+                        <a id="review-water-link" target="_blank">
+                            <img id="review-water-img" src="" alt="Nước" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMmQzNzQ4Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZpbGw9IiM3MThlOTYiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZHk9Ii4zZW0iIHRleHQtYW5jaG9yPSJtaWRkbGUiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg=='">
+                        </a>
+                    </div>
+                    <div class="meter-photo-box">
+                        <label>Đồng hồ Điện</label>
+                        <p class="meter-text" id="review-electric">--</p>
+                        <a id="review-electric-link" target="_blank">
+                            <img id="review-electric-img" src="" alt="Điện" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMmQzNzQ4Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZpbGw9IiM3MThlOTYiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZHk9Ii4zZW0iIHRleHQtYW5jaG9yPSJtaWRkbGUiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg=='">
+                        </a>
+                    </div>
                 </div>
-                <div>
-                    <strong>Chỉ số điện:</strong> <span id="review-electric"></span><br>
-                    <img id="review-electric-img" class="img-preview mt-2" src="" alt="Điện" style="cursor: pointer; border: 1px solid var(--border-color); width: 100%; max-height: 200px; object-fit: cover;" onclick="window.open(this.src, '_blank')">
-                </div>
-            </div>
 
-            <div class="card" style="background: var(--bg-color); box-shadow: none;">
-                <div class="flex justify-between mb-2"><span>Tiền phòng:</span><strong id="review-cost-room"></strong></div>
-                <div class="flex justify-between mb-2"><span>Tiền điện:</span><strong id="review-cost-electric"></strong></div>
-                <div class="flex justify-between mb-2"><span>Tiền nước:</span><strong id="review-cost-water"></strong></div>
-                <div class="flex justify-between mb-2"><span>Phí Internet:</span><strong id="review-cost-internet"></strong></div>
-                <div class="flex justify-between mb-2"><span>Phí rác/vệ sinh:</span><strong id="review-cost-trash"></strong></div>
-                <hr class="my-2" style="border-color: var(--border-color)">
-                <div class="flex justify-between text-lg"><span>Tổng cộng:</span><strong id="review-cost-total" style="color: var(--danger)"></strong></div>
-            </div>
-
-            <div class="form-group mt-4">
-                <label>Lý do từ chối (nếu có)</label>
-                <textarea id="review-reject-reason"></textarea>
-            </div>
-
-            <div class="flex justify-between mt-4">
-                <button type="button" class="btn btn-outline btn-close-modal">Đóng</button>
-                <div class="flex gap-2" id="review-action-buttons">
-                    <button type="button" id="btn-reject-report" class="btn btn-danger">Từ chối</button>
-                    <button type="button" id="btn-approve-report" class="btn btn-secondary">Duyệt (Tính tiền)</button>
-                    <button type="button" id="btn-mark-paid" class="btn btn-primary hidden">Xác nhận thu tiền</button>
-                    <button type="button" id="btn-print-invoice" class="btn btn-outline hidden"><i class="fas fa-print"></i> In Hóa Đơn</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Invoice Modal (For Printing) -->
-    <div id="modal-invoice" class="modal-overlay hidden">
-        <div class="modal-content" style="max-width: 600px;">
-            <div class="flex justify-between items-center mb-4 no-print">
-                <h3>Hóa Đơn Thu Tiền</h3>
-                <div>
-                    <button type="button" class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> In</button>
-                    <button type="button" class="modal-close-btn btn-close-modal" style="position: relative; right: auto; top: auto; display: inline-block; padding: 0.5rem">&times;</button>
-                </div>
-            </div>
-            
-            <div id="invoice-print-area" class="invoice-container">
-                <div class="text-center mb-4">
-                    <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem">HÓA ĐƠN TIỀN PHÒNG</h2>
-                    <p class="text-muted" id="invoice-period"></p>
+                <div class="invoice-breakdown mt-16">
+                    <div class="row"><span>Tiền phòng:</span><strong id="review-cost-room">0</strong></div>
+                    <div class="row"><span>Tiền nước:</span><strong id="review-cost-water">0</strong></div>
+                    <div class="row"><span>Tiền điện:</span><strong id="review-cost-electric">0</strong></div>
+                    <div class="row"><span>Tiền rác:</span><strong id="review-cost-trash">0</strong></div>
+                    <div class="row"><span>Tiền Internet:</span><strong id="review-cost-internet">0</strong></div>
+                    <div class="divider"></div>
+                    <div class="row total"><span>Tổng cộng:</span><strong id="review-cost-total" class="text-primary text-xl">0</strong></div>
                 </div>
                 
-                <div class="grid-2 mb-4">
-                    <div>
-                        <p><strong>Khách hàng:</strong> <span id="invoice-tenant"></span></p>
-                        <p><strong>Số phòng:</strong> <span id="invoice-room"></span></p>
-                    </div>
-                    <div style="text-align: right">
-                        <p><strong>Ngày in:</strong> <span id="invoice-date"></span></p>
-                    </div>
+                <div class="form-group mt-16" id="reject-reason-group">
+                    <label>Lý do từ chối (nếu có)</label>
+                    <input type="text" id="review-reject-reason" placeholder="VD: Ảnh mờ, sai chỉ số...">
                 </div>
 
-                <table class="invoice-table" style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem;">
-                    <thead>
-                        <tr style="border-bottom: 2px solid var(--border-color);">
-                            <th style="padding: 0.5rem 0; text-align: left;">Mô tả</th>
-                            <th style="padding: 0.5rem 0; text-align: right;">Thành tiền</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr style="border-bottom: 1px dashed var(--border-color);">
-                            <td style="padding: 0.5rem 0;">Tiền phòng</td>
-                            <td style="padding: 0.5rem 0; text-align: right;" id="invoice-room-rent"></td>
-                        </tr>
-                        <tr style="border-bottom: 1px dashed var(--border-color);">
-                            <td style="padding: 0.5rem 0;">Tiền điện <span id="invoice-electric-usage" class="text-muted text-sm"></span></td>
-                            <td style="padding: 0.5rem 0; text-align: right;" id="invoice-electric-cost"></td>
-                        </tr>
-                        <tr style="border-bottom: 1px dashed var(--border-color);">
-                            <td style="padding: 0.5rem 0;">Tiền nước <span id="invoice-water-usage" class="text-muted text-sm"></span></td>
-                            <td style="padding: 0.5rem 0; text-align: right;" id="invoice-water-cost"></td>
-                        </tr>
-                        <tr style="border-bottom: 1px dashed var(--border-color);">
-                            <td style="padding: 0.5rem 0;">Phí Internet</td>
-                            <td style="padding: 0.5rem 0; text-align: right;" id="invoice-internet-fee"></td>
-                        </tr>
-                        <tr style="border-bottom: 1px dashed var(--border-color);">
-                            <td style="padding: 0.5rem 0;">Phí vệ sinh/rác</td>
-                            <td style="padding: 0.5rem 0; text-align: right;" id="invoice-trash-fee"></td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td style="padding: 1rem 0; font-weight: bold; font-size: 1.2rem;">TỔNG CỘNG</td>
-                            <td style="padding: 1rem 0; font-weight: bold; font-size: 1.2rem; text-align: right; color: var(--primary);" id="invoice-total"></td>
-                        </tr>
-                    </tfoot>
-                </table>
-
-                <div class="text-center mt-4" id="invoice-qr-container">
-                    <p class="font-bold mb-2">Quét mã VietQR để thanh toán</p>
-                    <img id="invoice-qr" src="" alt="VietQR" style="max-width: 150px; margin: 0 auto;">
+                <div class="modal-actions mt-16" style="flex-wrap: wrap;">
+                    <button class="btn btn-outline btn-close-modal">Đóng</button>
+                    <button id="btn-reject-report" class="btn btn-danger">Từ Chối</button>
+                    <button id="btn-approve-report" class="btn btn-success">Duyệt & Chốt Bill</button>
+                    
+                    <!-- Only show if APPROVED -->
+                    <button id="btn-print-invoice" class="btn btn-primary hidden"><i class="fa-solid fa-file-invoice"></i> Xem & Gửi Hóa Đơn</button>
+                    <button id="btn-mark-paid" class="btn btn-success hidden"><i class="fa-solid fa-check-double"></i> Đã Thu Tiền</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Add Booking Modal -->
+    <!-- Modal Invoice Print -->
+    <div id="modal-invoice" class="modal-overlay hidden">
+        <div class="modal-content glass-panel" style="max-width: 500px; padding: 0;">
+            <div class="invoice-paper" id="invoice-printable-area">
+                <div class="inv-header">
+                    <h2>HÓA ĐƠN TIỀN PHÒNG</h2>
+                    <p id="invoice-period">Tháng --/----</p>
+                </div>
+                <div class="inv-meta">
+                    <p><span>Phòng:</span> <strong id="invoice-room">--</strong></p>
+                    <p><span>Khách thuê:</span> <strong id="invoice-tenant">--</strong></p>
+                    <p><span>Ngày lập:</span> <span id="invoice-date">--</span></p>
+                </div>
+                <table class="inv-table">
+                    <tr>
+                        <td>Tiền phòng</td>
+                        <td align="right" id="invoice-room-rent">0</td>
+                    </tr>
+                    <tr>
+                        <td>Tiền điện <div class="text-xs text-muted" id="invoice-electric-usage"></div></td>
+                        <td align="right" id="invoice-electric-cost">0</td>
+                    </tr>
+                    <tr>
+                        <td>Tiền nước <div class="text-xs text-muted" id="invoice-water-usage"></div></td>
+                        <td align="right" id="invoice-water-cost">0</td>
+                    </tr>
+                    <tr>
+                        <td>Tiền rác</td>
+                        <td align="right" id="invoice-trash-fee">0</td>
+                    </tr>
+                    <tr>
+                        <td>Tiền Internet</td>
+                        <td align="right" id="invoice-internet-fee">0</td>
+                    </tr>
+                </table>
+                <div class="inv-total flex-between">
+                    <span>Tổng cộng cần thanh toán</span>
+                    <strong id="invoice-total">0</strong>
+                </div>
+                
+                <div id="invoice-qr-container" class="inv-qr text-center mt-16 hidden">
+                    <p class="text-sm text-muted mb-8">Quét mã VietQR để thanh toán</p>
+                    <img id="invoice-qr" src="" alt="VietQR" style="width: 200px; height: 200px; object-fit: contain; border-radius: 8px;">
+                </div>
+            </div>
+            <div class="modal-actions" style="padding: 16px; border-top: 1px solid var(--border-color);">
+                <button class="btn btn-outline btn-close-modal">Đóng</button>
+                <button class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print"></i> In Hóa Đơn</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Add Booking (Demo) -->
     <div id="modal-add-booking" class="modal-overlay hidden">
-        <div class="modal-content">
-            <button type="button" class="modal-close-btn btn-close-modal">&times;</button>
-            <h3 class="mb-4">Tạo Đặt Phòng Mới</h3>
-            <form id="form-add-booking">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3>Thêm Đặt Cọc (Demo)</h3>
+                <button class="btn-close-modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="form-add-booking" class="modal-body">
                 <div class="form-group">
                     <label>Phòng</label>
-                    <select id="booking-room" required></select>
+                    <input type="text" id="booking-room" value="Demo" disabled>
                 </div>
                 <div class="form-group">
-                    <label>Tên khách</label>
-                    <input type="text" id="booking-guest-name" required>
+                    <label>Khách hàng</label>
+                    <input type="text" id="booking-guest-name">
                 </div>
-                <div class="grid-2 gap-4">
-                    <div class="form-group">
-                        <label>Số điện thoại</label>
-                        <input type="text" id="booking-guest-phone">
-                    </div>
-                    <div class="form-group">
-                        <label>CMND/CCCD</label>
-                        <input type="text" id="booking-guest-identity">
-                    </div>
+                <div class="form-group">
+                    <label>SĐT</label>
+                    <input type="text" id="booking-guest-phone">
                 </div>
-                <div class="grid-2 gap-4">
+                <div class="form-group">
+                    <label>CCCD</label>
+                    <input type="text" id="booking-guest-identity">
+                </div>
+                <div class="form-row">
                     <div class="form-group">
-                        <label>Ngày Check-in</label>
-                        <input type="date" id="booking-check-in" required>
+                        <label>Ngày cọc</label>
+                        <input type="date" id="booking-check-in">
                     </div>
                     <div class="form-group">
-                        <label>Ngày Check-out</label>
-                        <input type="date" id="booking-check-out" required>
+                        <label>Ngày dự kiến chuyển vào</label>
+                        <input type="date" id="booking-check-out">
                     </div>
                 </div>
-                <div class="flex justify-between mt-4">
+                <div class="modal-actions mt-16">
                     <button type="button" class="btn btn-outline btn-close-modal">Hủy</button>
-                    <button type="submit" class="btn btn-primary">Xác nhận</button>
+                    <button type="button" class="btn btn-primary btn-close-modal">Lưu (Chưa có API)</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="toast" class="toast hidden"></div>
-
+    <!-- SCRIPTS -->
     <script src="js/app.js"></script>
 </body>
 </html>
